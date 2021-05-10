@@ -1,0 +1,27 @@
+additionalProperties: false
+required:
+  - source_path
+  - destination_path
+  - transfer_label
+  - delete_label
+type: object
+properties:
+  source_path:
+    description: >-
+      The path on the source endpoint for the data. Note that this path must
+      exist.
+    type: string
+  destination_path:
+    description: >-
+      The path on the destination endpoint where the data will be stored
+    type: string
+  transfer_label:
+    description: >-
+      A label placed on the Transfer operation. Note that this label
+      must conform to Transfer's label requirements.
+    type: string
+  delete_label:
+    description: >-
+      A label placed on the Delete operation. Note that this label must conform
+      to Transfer's label requirements.
+    type: string

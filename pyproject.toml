@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "canned-flows"
+version = "0.1.0"
+description = ""
+authors = ["Uriel Mandujano <uriel@globus.org>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+globus-automate-client = "^0.11.3"
+PyYAML = "^5.4.1"
+Pygments = "^2.9.0"
+globus-sdk = "^2.0.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

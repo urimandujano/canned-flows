@@ -1,0 +1,35 @@
+additionalProperties: false
+required:
+  - source_endpoint_id
+  - source_path
+  - destination_endpoint_id
+  - destination_path
+  - transfer_label
+  - delete_label
+type: object
+properties:
+  source_endpoint_id:
+    description: >-
+      The uuid for the endpoint which serves as the source of the Move
+    type: string
+  source_path:
+    description: The path to the directory on the source endpoint
+    type: string
+  destination_endpoint_id:
+    description: >-
+      The uuid for the endpoint which serves as the destination for the Move
+    type: string
+  destination_path:
+    description: >-
+      The path on the destination endpoint where the data will be stored
+    type: string
+  transfer_label:
+    description: >-
+      A label placed on the Transfer operation. Note that this label must
+      conform to Transfer's label  requirements.
+    type: string
+  delete_label:
+    description: >-
+      A label placed on the Delete operation. Note that this label must conform
+      to Transfer's label requirements.
+    type: string

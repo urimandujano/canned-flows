@@ -1,0 +1,75 @@
+Comment: >-
+  A Flow which performs a Transfer on a directory and then gives a user READ
+  permissions permissions on the destination directory. The user running the
+  Flow must have administration privileges over the destination endpoint.
+StartAt: Transfer
+States:
+  Transfer:
+    Comment: >-
+      Run the initial Transfer from Globus Tutorial Endpoint1:source_path to
+      Globus Tutorial Endpoint2:destination_path
+    Type: Action
+    ActionUrl: "https://actions.globus.org/transfer/transfer"
+    Parameters:
+      source_endpoint_id: ddb59aef-6d04-11e5-ba46-22000b92c6ec
+      destination_endpoint_id: ddb59af0-6d04-11e5-ba46-22000b92c6ec
+      label.$: $.transfer_label
+      transfer_items:
+        - source_path.$: $.source_path
+          destination_path.$: $.destination_path
+          recursive: True
+    WaitTime: 120 # 2 minutes
+    ExceptionOnActionFailure: True
+    Catch:
+      - ErrorEquals: ["States.ALL"]
+        Next: TransferFailed
+    ResultPath: $.TransferResult
+    Next: SetPermission
+
+  SetPermission:
+    Comment: >-
+      Set the permissions on the destination_endpoint:destination_path. It uses the same
+      value for recursive as the transfer
+    Type: Action
+    ActionUrl: https://actions.globus.org/transfer/set_permission
+    Parameters:
+      operation: CREATE
+      endpoint_id: ddb59af0-6d04-11e5-ba46-22000b92c6ec
+      path.$: $.destination_path
+      principal_type: identity
+      principal.$: $.user_id
+      permissions: r
+      notify_email.$: $.user_email
+    WaitTime: 60 # 1 minute
+    ExceptionOnActionFailure: True
+    Catch:
+      - ErrorEquals: ["States.ALL"]
+        Next: SetPermissionFailed
+    ResultPath: $.SetPermissionResult
+    Next: AllComplete
+
+  TransferFailed:
+    Comment: Report the error and end the Flow Run
+    Type: Pass
+    Parameters:
+      message: Transfer failed
+      details.$: $.TransferResult.details
+    ResultPath: $.FlowResult
+    End: true
+
+  SetPermissionFailed:
+    Comment: Report the error and end the Flow Run
+    Type: Pass
+    Parameters:
+      message: Setting permission failed
+      details.$: $.SetPermissionResult.details
+    ResultPath: $.FlowResult
+    End: true
+
+  AllComplete:
+    Comment: Report the Flow Run completed successfully
+    Type: Pass
+    Parameters:
+      message: Move operation complete
+    ResultPath: $.FlowResult
+    End: true

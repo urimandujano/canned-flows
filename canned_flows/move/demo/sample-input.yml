@@ -1,0 +1,7 @@
+source_path: /~/result
+destination_path: /~/result
+transfer_label: >-
+  Transfer for Move from Globus Tutorial Endpoint 1 to Globus Tutorial Endpoint 2
+delete_label: >-
+  Delete after Transfer from for Move from Globus Tutorial Endpoint 1 to Globus 
+  Tutorial Endpoint 2

@@ -1,0 +1,88 @@
+Comment: >-
+  A Flow which performs a 'move' operation on a directory by first transferring
+  from a source to a destination and then deleting the directory from the
+  source. The entire directory's contents, including files and subdirectories,
+  will be moved to the destination and then removed from the source.
+StartAt: Transfer
+States:
+  Transfer:
+    Comment: >-
+      Run the initial Transfer from source_endpoint:source_path to 
+      destination_endpoint:destination_path
+    Type: Action
+    ActionUrl: "https://actions.globus.org/transfer/transfer"
+    Parameters:
+      source_endpoint_id.$: $.source_endpoint_id
+      destination_endpoint_id.$: $.destination_endpoint_id
+      label.$: $.transfer_label
+      transfer_items:
+        - source_path.$: $.source_path
+          destination_path.$: $.destination_path
+          recursive: True
+    WaitTime: 172800 # 48 hours
+    ExceptionOnActionFailure: False
+    ResultPath: $.TransferResult
+    Next: CheckTransfer
+
+  CheckTransfer:
+    Comment: >-
+      Examine the status of the Transfer. If it failed, branch to a state
+      that reports the error
+    Type: Choice
+    Choices:
+      - Variable: $.TransferResult.status
+        StringEquals: FAILED
+        Next: TransferFailed
+    Default: Delete
+
+  Delete:
+    Comment: >-
+      Use Transfer to delete the source_endpoint:source_path.
+    Type: Action
+    ActionUrl: "https://actions.globus.org/transfer/delete"
+    Parameters:
+      endpoint_id.$: $.source_endpoint_id
+      label.$: $.delete_label
+      items.=: "[`$.source_path`]"
+      recursive: True
+    WaitTime: 21600 # 6 hours
+    ExceptionOnActionFailure: False
+    ResultPath: $.DeleteResult
+    Next: CheckDelete
+
+  CheckDelete:
+    Comment: >-
+      Examine the status of the Deletion. If it failed, branch to a state
+      the reports the error
+    Type: Choice
+    Choices:
+      - Variable: $.DeleteResult.status
+        StringEquals: FAILED
+        Next: DeleteFailed
+    Default: AllComplete
+
+  TransferFailed:
+    Comment: Report the error and end the Flow Run
+    Type: Pass
+    Parameters:
+      message: Transfer failed
+      details.$: $.TransferResult.details
+    ResultPath: $.FlowResult
+    End: true
+
+  DeleteFailed:
+    Comment: Report the error and end the Flow Run
+    Type: Pass
+    Parameters:
+      message: Deletion failed
+      details.$: $.DeleteResult.details
+    ResultPath: $.FlowResult
+    End: true
+
+  AllComplete:
+    Comment: Report the Flow Run completed successfully
+    Type: Pass
+    Parameters:
+      message: Move operation complete
+    ResultPath: $.FlowResult
+    End: true
