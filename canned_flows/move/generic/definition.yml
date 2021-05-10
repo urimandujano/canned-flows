@@ -20,20 +20,12 @@ States:
           destination_path.$: $.destination_path
           recursive: True
     WaitTime: 172800 # 48 hours
-    ExceptionOnActionFailure: False
-    ResultPath: $.TransferResult
-    Next: CheckTransfer
-
-  CheckTransfer:
-    Comment: >-
-      Examine the status of the Transfer. If it failed, branch to a state
-      that reports the error
-    Type: Choice
-    Choices:
-      - Variable: $.TransferResult.status
-        StringEquals: FAILED
+    ExceptionOnActionFailure: True
+    Catch:
+      - ErrorEquals: ["States.ALL"]
         Next: TransferFailed
-    Default: Delete
+    ResultPath: $.TransferResult
+    Next: Delete
 
   Delete:
     Comment: >-
@@ -46,20 +38,12 @@ States:
       items.=: "[`$.source_path`]"
       recursive: True
     WaitTime: 21600 # 6 hours
-    ExceptionOnActionFailure: False
-    ResultPath: $.DeleteResult
-    Next: CheckDelete
-
-  CheckDelete:
-    Comment: >-
-      Examine the status of the Deletion. If it failed, branch to a state
-      the reports the error
-    Type: Choice
-    Choices:
-      - Variable: $.DeleteResult.status
-        StringEquals: FAILED
+    ExceptionOnActionFailure: True
+    Catch:
+      - ErrorEquals: ["States.ALL"]
         Next: DeleteFailed
-    Default: AllComplete
+    ResultPath: $.DeleteResult
+    Next: AllComplete
 
   TransferFailed:
     Comment: Report the error and end the Flow Run

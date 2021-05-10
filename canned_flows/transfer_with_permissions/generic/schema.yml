@@ -1,0 +1,45 @@
+additionalProperties: false
+required:
+  - source_endpoint_id
+  - destination_endpoint_id
+  - source_path
+  - destination_path
+  - transfer_label
+  - user_id
+  - user_email
+type: object
+properties:
+  source_endpoint_id:
+    description: >-
+      The uuid for the endpoint which serves as the source for the Transfer
+    type: string
+  destination_endpoint_id:
+    description: >-
+      The uuid for the endpoint which serves as the destination for the Transfer
+    type: string
+  source_path:
+    description: >-
+      The path on the source endpoint for the data. Note that this path must
+      exist.
+    type: string
+  destination_path:
+    description: >-
+      The path on the destination endpoint where the data will be stored
+    type: string
+  transfer_label:
+    description: >-
+      A label placed on the Transfer operation. Note that this label
+      must conform to Transfer's label requirements.
+    type: string
+  user_id:
+    description: >-
+      The Globus User ID which will be receiving read permission on the
+      destination endpoint destination path.
+    type: string
+    format: uuid
+  user_email:
+    description: >-
+      The Globus User email to which notification will be sent that the Globus
+      User has read permissions on the destination endpoint destination path.
+    type: string
+    format: email
